@@ -3,9 +3,10 @@ import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
 import clientPromise from "@/lib/mongodb";
 import { hash, compare } from "bcryptjs";
+import { ObjectId } from "mongodb";
 
-const handler = NextAuth({
-  secret: process.env.SECRET,
+const authOptions = NextAuth({
+  secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
   },
@@ -40,7 +41,7 @@ const handler = NextAuth({
         // console.log("req",req)
 
         const user = data[0];
-        // console.log(user);
+        // console.log(user._id.toString());
 
         // const hashedPassword = await hash(credentials.password,12)
         // console.log(hashedPassword)
@@ -51,8 +52,13 @@ const handler = NextAuth({
           // console.log(user)
 
           if (await compare(credentials.password, user.password)) {
-            // console.log(user)
-            return user as any;
+            // console.log("SIGNED IN",user)
+            return {
+              name: user.username,
+              email: user.email,
+              password: user.password,
+              id: user._id.toString(),
+            } as any;
           } else {
             return null;
           }
@@ -65,6 +71,27 @@ const handler = NextAuth({
       },
     }),
   ],
+  pages: {
+    signIn: "/signin",
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      user && (token.user = user);
+
+      // console.log(user)
+
+      return token;
+    },
+    async session({ session, token, user }) {
+      // console.log("USER",token);
+      // session.user = token.user
+      session.user.id = token.id;
+      return session;
+    },
+    redirect() {
+      return "/dashboard";
+    },
+  },
 });
 
-export { handler as POST, handler as GET };
+export { authOptions as POST, authOptions as GET };
