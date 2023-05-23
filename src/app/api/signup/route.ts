@@ -7,9 +7,10 @@ import { z } from "zod";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
+    console.log("body",body)
 
     const user = userValidator.parse(body.user);
-    // console.log(user)
+    console.log("user",user)
     const hashPassword = await hash(user.password, 12);
     const mongoClient = await clientPromise;
     

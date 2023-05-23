@@ -88,9 +88,9 @@ const authOptions = NextAuth({
       session.user.id = token.id;
       return session;
     },
-    redirect() {
-      return "/dashboard";
-    },
+    // redirect() {
+    //   return "/dashboard";
+    // },
   },
 });
 

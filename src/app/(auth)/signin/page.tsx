@@ -5,8 +5,9 @@ import { useForm } from "react-hook-form";
 import { toast } from 'react-hot-toast'
 import Input from '@mui/joy/Input';
 import Button from '@mui/joy/Button';
-
-
+import Alert from '@mui/joy/Alert';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface pageProps {
 
@@ -14,15 +15,31 @@ interface pageProps {
 
 const page: FC<pageProps> = ({ }) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
+  const router = useRouter();
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [isLoading, setIsLoading] = useState(false);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [signInError, setSignInError] = useState(false)
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
   async function loginWithCredentials(props: any) {
     // console.log("props", props.username, props.password)
     setIsLoading(true)
     try {
-      await signIn("credentials", { username: props.username, password: props.password })
+      setSignInError(false)
+      const status = await signIn("credentials", {
+        username: props.username, password: props.password
+        , redirect: false, callbackUrl: '/dashboard'
+      })
+      console.log(status)
+
+      if (status?.url) {
+        router.push(status.url);
+      } else {
+        setSignInError(true);
+      }
     } catch (error) {
+      console.log(error)
       toast.error("Something went wrong")
     } finally {
       setIsLoading(false)
@@ -30,44 +47,59 @@ const page: FC<pageProps> = ({ }) => {
   }
 
 
-  return <div className='flex items-center justify-center mt-10'>
-    <form onSubmit={handleSubmit(loginWithCredentials)} className='w-3/6 flex flex-col gap-2'>
-      {/* <input name="csrfToken" type="hidden" defaultValue={csrfToken} /> */}
-      <label>
-        {/* Username */}
-        {/* <input type="text" {...register("username")}  /> */}
+  return <div className='flex h-screen max-h-screen '>
+    <div className='w-3/6 flex flex-col justify-center relative aspect-square'>
+    <Image src={"/banner_images/signup.jpg"} alt="Signup banner" fill objectFit='contain'  />
+  </div>
+    <div className='w-3/6 flex flex-col justify-center'>
+
+      <form onSubmit={handleSubmit(loginWithCredentials)} className='w-4/6 flex flex-col m-auto gap-2 inline-block '>
+        {/* <input name="csrfToken" type="hidden" defaultValue={csrfToken} /> */}
+        <div className='my-2'>
+          <h1 className='m-0 text-4xl'>Login</h1>
+          <p className='my-1 text-sm text-slate-400'>Not a Member? <a className='text-blue-500 no-underline' href='/signup'>Sign Up</a></p>
+          </div>
         <Input
           color="neutral"
           disabled={isLoading}
           placeholder="Username"
-          size="md"
+          size="lg"
           variant="soft"
-
+          required
+          fullWidth
           {...register("username")}
+          className='MuiInput-input'
         />
-      </label>
-      <label>
-        {/* Password */}
-        {/* <input type="password" {...register("password")} /> */}
         <Input
           color="neutral"
           disabled={isLoading}
           placeholder="Password"
-          size="md"
+          size="lg"
           variant="soft"
-
+          type="password"
+          required
+          fullWidth
           {...register("password")}
         />
-      </label>
-      {/* <button type="submit">Sign in</button> */}
-      <Button
-        color="success"
-        disabled={isLoading}
-        type='submit'
-        variant="outlined"
-        size="lg"
-      >Sign In</Button>
-    </form>
+        {/* <button type="submit">Sign in</button> */}
+        <Button
+          color="success"
+          disabled={isLoading}
+          type='submit'
+          variant="soft"
+          size="lg"
+          fullWidth
+        >Sign In</Button>
+        {signInError ? (
+          <Alert
+            color="danger"
+            size="lg"
+            variant="soft"
+          >There is a problem with the Username/Password</Alert>
+        ) : null}
+      </form>
+
+    </div>
   </div>
 }
 
