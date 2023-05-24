@@ -4,6 +4,7 @@ import { hash } from "bcryptjs";
 import { userValidator } from "@/lib/validations/signup";
 import { z } from "zod";
 
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
