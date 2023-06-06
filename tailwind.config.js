@@ -14,11 +14,11 @@ module.exports = {
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
       colors:{
-        'primary-custom':'#010e0b',
-        'secondary-custom':'#f1fefa',
-        'primary-button-custom':'#10b7e5',
-        'secondary-button-custom':'#ffffff',
-        'accent-custom':'#092c86',
+        'primary-custom':'#000000',
+        'secondary-custom':'#F8F8F7',
+        'primary-button-custom':'#FFCA40',
+        'secondary-button-custom':'#C8161D',
+        'accent-custom':'#808080',
       }
     },
     
